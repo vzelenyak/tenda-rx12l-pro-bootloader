@@ -1316,6 +1316,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += \
 	mt7981-snfi-nand-rfb.dtb \
 	mt7981-spim-nand-rfb.dtb \
 	mt7981-spim-nor-rfb.dtb \
+	mt7981b-tenda-rx12l-pro.dtb \
 	mt7981-emmc-rfb.dtb \
 	mt7981-sd-rfb.dtb \
 	mt7986a-bpi-r3-sd.dtb \
