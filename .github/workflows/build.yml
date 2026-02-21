@@ -1,0 +1,36 @@
+name: Build Bootloader for Tenda RX12L Pro
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler qemu-user-static git
+      
+      - name: Build bootloader
+        run: |
+          SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
+          ls -la output/
+      
+      - name: Upload BL2
+        uses: actions/upload-artifact@v4
+        with:
+          name: bl2
+          path: output/*bl2*.bin
+          
+      - name: Upload FIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: fip
+          path: output/*fip*.bin
