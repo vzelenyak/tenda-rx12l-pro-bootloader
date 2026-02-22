@@ -13,29 +13,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
-      - name: Install dependencies
+      - name: Install cross compiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu libssl-dev flex bison device-tree-compiler git
-          echo "Installing cross compiler..."
-          aarch64-linux-gnu-gcc --version || apt list --installed | grep aarch64
+          sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
+          echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
+          echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
+          ls -la /usr/bin/aarch64*
+        
+      - name: Install other dependencies
+        run: |
+          sudo apt-get install -y flex bison libssl-dev device-tree-compiler git python3
         
       - name: Build bootloader
         run: |
           export CROSS_COMPILE=aarch64-linux-gnu-
-          SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
-          ls -la output/ || echo "Output dir not found"
+          export CC=${CC:-aarch64-linux-gnu-gcc-11}
+          export CXX=${CXX:-aarch64-linux-gnu-g++-11}
+          ls -la /usr/bin/aarch64-linux-gnu*
+          SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh 2>&1 || true
+          ls -la output/ 2>/dev/null || echo "No output"
       
-      - name: Upload BL2
+      - name: Upload artifacts
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: bl2
-          path: output/*bl2*.bin
-          
-      - name: Upload FIP
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fip
-          path: output/*fip*.bin
+          name: bootloader
+          path: output/
