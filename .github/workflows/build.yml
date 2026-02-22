@@ -16,20 +16,25 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler qemu-user-static git
-      
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu libssl-dev flex bison device-tree-compiler git
+          echo "Installing cross compiler..."
+          aarch64-linux-gnu-gcc --version || apt list --installed | grep aarch64
+        
       - name: Build bootloader
         run: |
+          export CROSS_COMPILE=aarch64-linux-gnu-
           SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
-          ls -la output/
+          ls -la output/ || echo "Output dir not found"
       
       - name: Upload BL2
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: bl2
           path: output/*bl2*.bin
           
       - name: Upload FIP
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: fip
