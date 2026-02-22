@@ -30,13 +30,16 @@ jobs:
           export CROSS_COMPILE=aarch64-linux-gnu-
           export CC=${CC:-aarch64-linux-gnu-gcc-11}
           export CXX=${CXX:-aarch64-linux-gnu-g++-11}
-          ls -la /usr/bin/aarch64-linux-gnu*
-          SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh 2>&1 || true
-          ls -la output/ 2>/dev/null || echo "No output"
+          SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
+          echo "=== Output contents ==="
+          find . -name "*.bin" -type f 2>/dev/null
+          ls -la output/ 2>/dev/null || echo "No output dir"
       
-      - name: Upload artifacts
-        if: success()
+      - name: Upload all binaries
         uses: actions/upload-artifact@v4
         with:
-          name: bootloader
-          path: output/
+          name: bootloader-files
+          path: |
+            output/
+            **/*.bin
+          if-no-files-found: error
