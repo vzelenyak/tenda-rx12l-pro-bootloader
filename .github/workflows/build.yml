@@ -24,6 +24,7 @@ jobs:
         
       - name: Build bootloader
         run: |
+          export PATH="/usr/bin:$PATH"
           export CROSS_COMPILE=aarch64-linux-gnu-
           SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
           echo "=== Build complete, checking output ==="

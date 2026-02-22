@@ -23,21 +23,24 @@ command -v python3
 
 echo "Trying cross compiler..."
 if command -v "${TOOLCHAIN}gcc" >/dev/null 2>&1; then
-    :
+    export CROSS_COMPILE="$TOOLCHAIN"
 elif command -v "${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}" >/dev/null 2>&1; then
     export CC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
     export GCC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
+    export CROSS_COMPILE="$TOOLCHAIN"
 elif [ -x "/usr/bin/${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}" ]; then
     export PATH="/usr/bin:$PATH"
     export CC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
     export GCC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
+    export CROSS_COMPILE="$TOOLCHAIN"
 elif [ -x "/usr/aarch64-linux-gnu/bin/${TOOLCHAIN}gcc" ]; then
     export PATH="/usr/aarch64-linux-gnu/bin:$PATH"
+    export CROSS_COMPILE="$TOOLCHAIN"
 else
     echo "${TOOLCHAIN}gcc not found!"
     exit 1
 fi
-export CROSS_COMPILE="$TOOLCHAIN"
+echo "Using CROSS_COMPILE=$CROSS_COMPILE"
 
 ATF_CFG="${SOC}_${BOARD}_defconfig"
 UBOOT_CFG="${SOC}_${BOARD}_defconfig"
