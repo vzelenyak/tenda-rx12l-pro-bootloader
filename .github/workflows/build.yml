@@ -24,14 +24,6 @@ jobs:
         
       - name: Build bootloader
         run: |
-          echo "=== Checking PATH ==="
-          echo $PATH
-          echo "=== Finding compiler ==="
-          ls /usr/bin/aarch64* 2>/dev/null || echo "Not in /usr/bin"
-          which aarch64-linux-gnu-gcc || echo "not in PATH"
-          export PATH="$PATH:/usr/aarch64-linux-gnu/bin"
-          echo "=== After adding to PATH ==="
-          which aarch64-linux-gnu-gcc
           export CROSS_COMPILE=aarch64-linux-gnu-
           SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
           echo "=== Build complete, checking output ==="
