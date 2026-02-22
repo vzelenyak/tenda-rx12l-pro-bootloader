@@ -1,7 +1,6 @@
 #!/bin/sh
 
 TOOLCHAIN=aarch64-linux-gnu-
-TOOLCHAIN_VERSION=11
 #UBOOT_DIR=uboot-mtk-20220606
 UBOOT_DIR=uboot-mtk-20230718-09eda825
 #ATF_DIR=atf-20220606-637ba581b
@@ -24,17 +23,8 @@ command -v python3
 echo "Trying cross compiler..."
 if command -v "${TOOLCHAIN}gcc" >/dev/null 2>&1; then
     export CROSS_COMPILE="$TOOLCHAIN"
-elif command -v "${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}" >/dev/null 2>&1; then
-    export CC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
-    export GCC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
-    export CROSS_COMPILE="$TOOLCHAIN"
-elif [ -x "/usr/bin/${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}" ]; then
+elif [ -x "/usr/bin/${TOOLCHAIN}gcc" ]; then
     export PATH="/usr/bin:$PATH"
-    export CC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
-    export GCC="${TOOLCHAIN}gcc-${TOOLCHAIN_VERSION}"
-    export CROSS_COMPILE="$TOOLCHAIN"
-elif [ -x "/usr/aarch64-linux-gnu/bin/${TOOLCHAIN}gcc" ]; then
-    export PATH="/usr/aarch64-linux-gnu/bin:$PATH"
     export CROSS_COMPILE="$TOOLCHAIN"
 else
     echo "${TOOLCHAIN}gcc not found!"
@@ -79,7 +69,7 @@ if [ "$fixedparts" = "1" ]; then
 fi
 make -C "$UBOOT_DIR" olddefconfig
 make -C "$UBOOT_DIR" clean
-make -C "$UBOOT_DIR" -j $(nproc) CC="${CC:-}" GCC="${GCC:-}" all
+make -C "$UBOOT_DIR" -j $(nproc) all
 if [ -f "$UBOOT_DIR/u-boot.bin" ]; then
 	echo "u-boot build done!"
 else
@@ -93,10 +83,10 @@ if [ -e "$ATF_DIR/makefile" ]; then
 else
 	ATF_MKFILE="Makefile"
 fi
-make -C "$ATF_DIR" -f "$ATF_MKFILE" clean CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN" CC="${CC:-}" GCC="${GCC:-}"
+make -C "$ATF_DIR" -f "$ATF_MKFILE" clean CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN"
 rm -rf "$ATF_DIR/build"
-make -C "$ATF_DIR" -f "$ATF_MKFILE" "$ATF_CFG" CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN" CC="${CC:-}" GCC="${GCC:-}"
-make -C "$ATF_DIR" -f "$ATF_MKFILE" all CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN" CC="${CC:-}" GCC="${GCC:-}" CONFIG_BL33="../$UBOOT_DIR/u-boot.bin" BL33="../$UBOOT_DIR/u-boot.bin" -j $(nproc)
+make -C "$ATF_DIR" -f "$ATF_MKFILE" "$ATF_CFG" CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN"
+make -C "$ATF_DIR" -f "$ATF_MKFILE" all CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS_COMPILER="$TOOLCHAIN" CONFIG_BL33="../$UBOOT_DIR/u-boot.bin" BL33="../$UBOOT_DIR/u-boot.bin" -j $(nproc)
 
 mkdir -p "output"
 if [ -f "$ATF_DIR/build/$SOC/release/fip.bin" ]; then
