@@ -20,7 +20,17 @@ jobs:
         
       - name: Install other dependencies
         run: |
-          sudo apt-get install -y flex bison libssl-dev device-tree-compiler git python3
+          sudo apt-get update
+          sudo apt-get install -y flex bison libssl-dev git python3
+          # Build device-tree-compiler from source for newer version
+          sudo apt-get install -y git build-essential
+          cd /tmp
+          git clone --depth 1 https://github.com/dgibson/dtc.git
+          cd dtc
+          make -j$(nproc)
+          sudo make install
+          cd ~
+          rm -rf /tmp/dtc
         
       - name: Build bootloader
         run: |
