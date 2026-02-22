@@ -17,9 +17,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu
-          echo "CC=aarch64-linux-gnu-gcc-11" >> $GITHUB_ENV
-          echo "CXX=aarch64-linux-gnu-g++-11" >> $GITHUB_ENV
-          ls -la /usr/bin/aarch64*
         
       - name: Install other dependencies
         run: |
@@ -28,18 +25,23 @@ jobs:
       - name: Build bootloader
         run: |
           export CROSS_COMPILE=aarch64-linux-gnu-
-          export CC=${CC:-aarch64-linux-gnu-gcc-11}
-          export CXX=${CXX:-aarch64-linux-gnu-g++-11}
           SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
-          echo "=== Output contents ==="
-          find . -name "*.bin" -type f 2>/dev/null
-          ls -la output/ 2>/dev/null || echo "No output dir"
-      
-      - name: Upload all binaries
+          echo "=== Build complete, checking output ==="
+          ls -la output/
+          find . -name "*.bin" -type f
+        
+      - name: Upload FIP
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: bootloader-files
-          path: |
-            output/
-            **/*.bin
+          name: fip-bin
+          path: output/*fip*.bin
+          if-no-files-found: error
+        
+      - name: Upload BL2
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bl2-bin
+          path: output/*bl2*.bin
           if-no-files-found: error
