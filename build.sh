@@ -21,8 +21,16 @@ command -v python3
 [ "$?" != "0" ] && { echo "Error: Python is not installed on this system."; exit 0; }
 
 echo "Trying cross compiler..."
-command -v "${TOOLCHAIN}gcc"
-[ "$?" != "0" ] && { echo "${TOOLCHAIN}gcc not found!"; exit 0; }
+if command -v "${TOOLCHAIN}gcc" >/dev/null 2>&1; then
+    :
+elif [ -x "/usr/bin/${TOOLCHAIN}gcc" ]; then
+    export PATH="/usr/bin:$PATH"
+elif [ -x "/usr/aarch64-linux-gnu/bin/${TOOLCHAIN}gcc" ]; then
+    export PATH="/usr/aarch64-linux-gnu/bin:$PATH"
+else
+    echo "${TOOLCHAIN}gcc not found!"
+    exit 1
+fi
 export CROSS_COMPILE="$TOOLCHAIN"
 
 ATF_CFG="${SOC}_${BOARD}_defconfig"
