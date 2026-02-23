@@ -32,14 +32,14 @@ jobs:
           SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
           echo "=== Build complete, checking output ==="
           ls -la output/
-          find . -name "*.bin" -type f
+          find . -name "*.fip" -type f
         
       - name: Upload FIP
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: fip-bin
-          path: output/*fip*.bin
+          path: output/*.fip
           if-no-files-found: error
         
       - name: Upload BL2
