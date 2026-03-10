@@ -13,6 +13,10 @@ if [ -z "$SOC" ] || [ -z "$BOARD" ]; then
 	echo "eg: SOC=mt7981 BOARD=cmcc_rax3000m-emmc $0"
 	echo "eg: SOC=mt7986 BOARD=redmi_ax6000 MULTI_LAYOUT=1 $0"
 	echo "eg: SOC=mt7986 BOARD=jdcloud_re-cp-03 $0"
+	echo ""
+	echo "Tenda RX12L Pro:"
+	echo "  UART boot (mtk_uartboot): SOC=mt7981 BOARD=tenda_rx12l_pro_uart $0"
+	echo "  SPI NOR flash:           SOC=mt7981 BOARD=tenda_rx12l_pro $0"
 	exit 1
 fi
 
@@ -34,6 +38,13 @@ echo "Using CROSS_COMPILE=$CROSS_COMPILE"
 
 ATF_CFG="${SOC}_${BOARD}_defconfig"
 UBOOT_CFG="${SOC}_${BOARD}_defconfig"
+
+# Check if this is UART boot config
+if grep -Eq "^_RAM_BOOT=y" $ATF_DIR/configs/$ATF_CFG 2>/dev/null; then
+	uart_boot=1
+else
+	uart_boot=0
+fi
 
 if grep -Eq "CONFIG_FLASH_DEVICE_EMMC=y|_BOOT_DEVICE_EMMC=y" $ATF_DIR/configs/$ATF_CFG ; then
 	# No fixed-mtdparts or multilayout for EMMC
@@ -91,6 +102,9 @@ make -C "$ATF_DIR" -f "$ATF_MKFILE" all CONFIG_CROSS_COMPILER="$TOOLCHAIN" CROSS
 mkdir -p "output"
 if [ -f "$ATF_DIR/build/$SOC/release/fip.bin" ]; then
 	FIP_NAME="${SOC}_${BOARD}-fip"
+	if [ "$uart_boot" = "1" ]; then
+		FIP_NAME="${FIP_NAME}-uart"
+	fi
 	if [ "$fixedparts" = "1" ]; then
 		FIP_NAME="${FIP_NAME}-fixed-parts"
 	fi
@@ -106,6 +120,9 @@ fi
 if grep -Eq "(^_|CONFIG_TARGET_ALL_NO_SEC_BOOT=y)" "$ATF_DIR/configs/$ATF_CFG"; then
 	if [ -f "$ATF_DIR/build/$SOC/release/bl2.img" ]; then
 		BL2_NAME="${SOC}_${BOARD}-bl2"
+		if [ "$uart_boot" = "1" ]; then
+			BL2_NAME="${BL2_NAME}-uart"
+		fi
 		cp -f "$ATF_DIR/build/$SOC/release/bl2.img" "output/$BL2_NAME.bin"
 		echo "$BL2_NAME build done"
 	else
