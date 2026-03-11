@@ -16,12 +16,11 @@ sudo apt install gcc-aarch64-linux-gnu build-essential flex bison libssl-dev dev
 
 ## Build
 ```
-Usage: SOC=[mt7981|mt7986] BOARD=<board name> MULTI_LAYOUT=[0|1] ./build.sh
-eg: SOC=mt7981 BOARD=360t7 ./build.sh
-eg: SOC=mt7981 BOARD=wr30u MULTI_LAYOUT=1 ./build.sh
-eg: SOC=mt7981 BOARD=cmcc_rax3000m-emmc ./build.sh
-eg: SOC=mt7986 BOARD=redmi_ax6000 MULTI_LAYOUT=1 ./build.sh
-eg: SOC=mt7986 BOARD=jdcloud_re-cp-03 ./build.sh
+# UART boot (for loading via mtk_uartboot)
+SOC=mt7981 BOARD=tenda_rx12l_pro_uart ./build.sh
+
+# SPI NOR flash (for permanent installation)
+SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh
 ```
 
 ---
