@@ -93,7 +93,8 @@ First, build OpenWrt for Tenda RX12L Pro to get `sysupgrade.bin`.
 2. Go to **System → Backup/Flash Firmware**
 3. Under "Flash new firmware image", click **Choose File**
 4. Select `openwrt-*-tenda_rx12l_pro-squashfs-sysupgrade.bin`
-5. Click **Flash image**
+5. Make backup of your partitions (0-4): click **Generate archive**
+6. Click **Flash image**
 
 Alternatively, via SSH:
    ```
