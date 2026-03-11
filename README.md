@@ -1,7 +1,7 @@
 # ATF and u-boot for mt798x
 
 ## Forked from
-Original repository: https://github.com/vzelenyak/tenda-rx12l-pro-bootloader
+Original repository: https://github.com/hanwckf/bl-mt798x
 
 ## About bl-mt798x
 - https://cmi.hanwckf.top/p/mt798x-uboot-usage
