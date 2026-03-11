@@ -15,7 +15,7 @@ DEFCONFIG := $(KCONFIG_DIR)/defconfig.py
 
 TOP_CONFIG := $(CURDIR)/Config.in
 
-PYTHON := $(shell which python)
+PYTHON := $(shell which python3)
 
 check_python:
 ifeq ($(PYTHON),)
