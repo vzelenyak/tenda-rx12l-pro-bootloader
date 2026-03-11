@@ -78,17 +78,30 @@ First, build OpenWrt for Tenda RX12L Pro to get `sysupgrade.bin`.
    ```
 3. U-Boot should start, then load OpenWrt initramfs via TFTP
 
-#### Step 3: Install OpenWrt
-1. Boot into U-Boot via UART
-2. Load and flash sysupgrade.bin via TFTP:
+#### Step 3: Load OpenWrt to RAM
+1. Boot into U-Boot via UART (see Step 2)
+2. Load OpenWrt initramfs via TFTP:
    ```
    setenv ipaddr 192.168.1.2
    setenv serverip 192.168.1.3
-   tftpboot 0x46000000 openwrt-*-tenda_rx12l_pro-squashfs-sysupgrade.bin
-   mtd write 0x46000000 firmware
+   tftpboot 0x46000000 openwrt-*-tenda_rx12l_pro-squashfs-initramfs.bin
+   bootm 0x46000000
    ```
 
-#### Step 4: Permanent Flash (Optional)
+#### Step 4: Flash via LuCI
+1. After OpenWrt boots, login to LuCI at http://192.168.1.1
+2. Go to **System → Backup/Flash Firmware**
+3. Under "Flash new firmware image", click **Choose File**
+4. Select `openwrt-*-tenda_rx12l_pro-squashfs-sysupgrade.bin`
+5. Click **Flash image**
+
+Alternatively, via SSH:
+   ```
+   scp openwrt-*-tenda_rx12l_pro-squashfs-sysupgrade.bin root@192.168.1.1:/tmp/
+   ssh root@192.168.1.1 "sysupgrade -n /tmp/openwrt-*-tenda_rx12l_pro-squashfs-sysupgrade.bin"
+   ```
+
+#### Step 5: Permanent Flash (Optional)
 After OpenWrt is running, you can flash the bootloader to SPI NOR:
 1. Build SPI NOR version: `SOC=mt7981 BOARD=tenda_rx12l_pro ./build.sh`
 2. Upload files to router
@@ -114,7 +127,7 @@ After OpenWrt is running, you can flash the bootloader to SPI NOR:
 
 4. **Load OpenWrt to RAM** - via TFTP in U-Boot
 
-5. **Flash sysupgrade.bin** - via LuCI or mtd
+5. **Flash sysupgrade.bin** - via LuCI (System → Backup/Flash Firmware)
 
 6. **Build final BL2+FIP for flash** - for permanent installation
    ```bash
